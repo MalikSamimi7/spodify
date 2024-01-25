@@ -130,10 +130,16 @@ const signIn = async (req, res) => {
   res.json({ user: { userId: user._id, token } });
 };
 
+const cloudinary = require("../cloud/index");
+
 const updateAccount = async (req, res) => {
-  const { name } = req.body;
+  let { name } = req.body;
+
+  name = name[0];
 
   const avatar = req.files?.avatar;
+  //console.log(avatar[0].filepath);
+
   const user = await User.findById(req.user.userId);
   if (!user) throw new Error("user not found");
 
@@ -145,12 +151,27 @@ const updateAccount = async (req, res) => {
   user.name = name;
 
   if (avatar) {
-    user.avatar = { url: "secure_url", publicId: "public_id" };
+    try {
+      if (user.avatar?.publicId) {
+        await cloudinary.uploader.destroy(user.avatar.publicId);
+      }
+      const { public_id, secure_url } = await cloudinary.uploader.upload(
+        avatar[0].filepath,
+        { width: 300, height: 300, crop: "thumb", gravity: "face" },
+        function (error, result) {
+          console.log(error);
+        }
+      );
+      user.avatar = { url: secure_url, publicId: public_id };
+    } catch (error) {
+      // console.log(error);
+      return res.status(403).json({ error: "somrhing went wrong" });
+    }
   }
 
   await user.save();
 
-  res.json({ message: "account updated", avatar: user.avatar });
+  return res.json({ message: "account updated", avatar: user.avatar });
 };
 
 const sendProfile = (req, res) => {
