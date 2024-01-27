@@ -14,7 +14,15 @@ const fileParser = async (req, res, next) => {
   form.parse(req, (err, fields, files) => {
     if (err) return next(err);
 
-    req.body = fields;
+    // console.log(fields);
+
+    let transformedFields = {};
+
+    for (const field in fields) {
+      transformedFields[field] = `${fields[field]}`;
+    }
+    // console.log(transformedFields);
+    req.body = transformedFields;
     req.files = files;
 
     next();

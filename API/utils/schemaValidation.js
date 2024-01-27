@@ -1,5 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 const yup = require("yup");
+const categories = require("./audio_category");
 
 const userSchemaValidation = yup.object().shape({
   name: yup
@@ -84,6 +85,15 @@ const signInValidatinSchema = yup.object().shape({
     ),
 });
 
+const audioValidationSchema = yup.object().shape({
+  title: yup.string().required("audion title missing"),
+  about: yup.string().required("about is missing"),
+  category: yup
+    .string()
+    .oneOf(categories, "invalid category")
+    .required("category is missing"),
+});
+
 module.exports = {
   userSchemaValidation,
   emailVerificationSchema,
@@ -91,4 +101,5 @@ module.exports = {
   verifyUserByMailVShema,
   resetPasswordVSchema,
   signInValidatinSchema,
+  audioValidationSchema,
 };

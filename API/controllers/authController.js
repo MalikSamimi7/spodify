@@ -5,7 +5,7 @@ const {
   MAILTRAP_USER,
   JWT_SECRET,
 } = require("../utils/variables");
-const { generateToken } = require("../utils/helper");
+const { generateToken, formatProfile } = require("../utils/helper");
 const EmailVerificationToken = require("../models/emailVerificationToken");
 const sendVerificationMail = require("../utils/mail");
 const jwt = require("jsonwebtoken");
@@ -159,7 +159,7 @@ const updateAccount = async (req, res) => {
         avatar[0].filepath,
         { width: 300, height: 300, crop: "thumb", gravity: "face" },
         function (error, result) {
-          console.log(error);
+          // console.log(error);
         }
       );
       user.avatar = { url: secure_url, publicId: public_id };
@@ -171,7 +171,7 @@ const updateAccount = async (req, res) => {
 
   await user.save();
 
-  return res.json({ message: "account updated", avatar: user.avatar });
+  return res.json({ message: "account updated", profile: formatProfile(user) });
 };
 
 const sendProfile = (req, res) => {
