@@ -59,7 +59,33 @@ const getFavorites = async (req, res) => {
     path: "items",
     populate: { path: "owner" },
   });
-  res.json({ favorite: favorite });
+  if (!favorite)
+    return res.status(422).json({ error: "no favorite audio found" });
+  const audios = favorite.items.map((item) => {
+    return {
+      id: item._id,
+      title: item.title,
+      category: item.category,
+      file: item.file.url,
+      poster: item.poster?.url,
+      owner: { id: item.owner._id, name: item.owner.name },
+    };
+  });
+  res.json({ favorite: audios });
 };
 
-module.exports = { toggleFavorite, getFavorites };
+const isFav = async (req, res) => {
+  const { audioId } = req.query;
+
+  if (!isValidObjectId(audioId))
+    return res.status(404).json({ error: "invalid audio id" });
+
+  const favorite = await Favorite.findOne({
+    owner: req.user.userId,
+    items: audioId,
+  });
+
+  res.json({ result: favorite ? true : false });
+};
+
+module.exports = { toggleFavorite, getFavorites, isFav };
