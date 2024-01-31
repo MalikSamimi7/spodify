@@ -17,10 +17,11 @@ const isAuth = async (req, res, next) => {
 
     const id = payload.userId;
 
-    const user = await User.findById(id);
+    const user = await User.findOne({ _id: id, tokens: token });
     if (!user) return res.status(403).json({ error: "unauthorized request" });
 
     req.user = formatProfile(user);
+    req.token = token;
   } catch (error) {
     if (error instanceof JsonWebTokenError)
       return res.status(404).json({ error: "unauthorized request" });

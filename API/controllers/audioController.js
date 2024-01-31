@@ -52,4 +52,46 @@ const createAudio = async (req, res) => {
   });
 };
 
-module.exports = { createAudio };
+const updateAudio = async (req, res) => {
+  const { title, about, category } = req.body;
+  const userId = req.user.userId;
+  const audioId = req.params.audioId;
+  const file = req.files.file;
+  const poster = req.files.poster;
+
+  const audio = await Audio.findOneAndUpdate(
+    { owner: userId, _id: audioId },
+    { title, about, category },
+    { new: true }
+  );
+  if (!audio) return res.status(404).json({ error: "no record found" });
+
+  if (poster) {
+    if (audio.poster?.publicId) {
+      await cloudinary.uploader.destroy(audio.poster.publicId);
+    }
+
+    const { public_id, secure_url } = await cloudinary.uploader.upload(
+      poster[0].filepath,
+      {
+        height: 300,
+        width: 300,
+        crop: "thumb",
+        gravity: "face",
+      }
+    );
+    audio.poster = { url: secure_url, publicId: public_id };
+    await audio.save();
+  }
+  return res.status(201).json({
+    audio: {
+      title,
+      about,
+      category,
+      poster: audio.poster?.url,
+      file: audio.file.url,
+    },
+  });
+};
+
+module.exports = { createAudio, updateAudio };

@@ -178,6 +178,27 @@ const sendProfile = (req, res) => {
   res.json({ profile: req.user });
 };
 
+const logOut = async (req, res) => {
+  const fromAll = req.query.fromAll;
+  const token = req.token;
+  let status;
+
+  const user = await User.findById(req.user.userId);
+
+  if (!user) return res.status(422).json({ error: "user not found!" });
+
+  if (fromAll === "yes") {
+    user.tokens = [];
+    status = "from all devices";
+  } else {
+    user.tokens = user.tokens.filter((t) => t != token);
+    status = "only from this device";
+  }
+  await user.save();
+
+  res.json({ message: "logged out " + status });
+};
+
 module.exports = {
   create,
   verifyEmail,
@@ -187,4 +208,5 @@ module.exports = {
   signIn,
   updateAccount,
   sendProfile,
+  logOut,
 };

@@ -74,15 +74,7 @@ const resetPasswordVSchema = yup.object().shape({
 
 const signInValidatinSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("email required"),
-  password: yup
-    .string()
-    .trim()
-    .required("password is required")
-    .min(8, "password too short")
-    .matches(
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/,
-      "password is too simple"
-    ),
+  password: yup.string().trim().required("password is required"),
 });
 
 const audioValidationSchema = yup.object().shape({

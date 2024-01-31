@@ -11,6 +11,7 @@ const {
   signIn,
   sendProfile,
   updateAccount,
+  logOut,
 } = require("../controllers/authController");
 const {
   userSchemaValidation,
@@ -55,5 +56,7 @@ router.get("/sign-in", validater(signInValidatinSchema), signIn);
 router.get("/is-auth", isAuth, sendProfile);
 
 router.put("/update-account", isAuth, fileParser, updateAccount);
+
+router.get("/log-out", isAuth, logOut);
 
 module.exports = router;

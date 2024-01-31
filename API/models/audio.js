@@ -14,7 +14,7 @@ const audioSchema = new Schema(
     owner: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "user",
+      ref: "User",
     },
     file: { type: Object, url: String, publicId: String, required: true },
     poster: {
@@ -25,7 +25,7 @@ const audioSchema = new Schema(
     likes: [
       {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
       },
     ],
     category: {
